@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام مواقيت الصلاة للمساجد - الجزائر</title>
+    <!-- خط تجوال العربي العصري -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a192f;
+            --bg-card: #112240;
+            --gold: #dfb15b;
+            --gold-bright: #ffd700;
+            --text-light: #e6f1ff;
+            --text-muted: #8892b0;
+            --accent-green: #2ecc71;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* ----- SHADOWS & EFFECTS ----- */
+        .glow {
+            text-shadow: 0 0 15px rgba(223, 177, 91, 0.4);
+        }
+
+        /* ----- HEADER ----- */
+        header {
+            background: linear-gradient(180deg, rgba(17, 34, 64, 0.9) 0%, rgba(10, 25, 47, 0.8) 100%);
+            border-bottom: 2px solid var(--gold);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .mosque-info h1 {
+            font-size: 2.8rem;
+            color: var(--gold);
+            font-weight: 800;
+        }
+
+        .mosque-info p {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .clock-box {
+            text-align: left;
+        }
+
+        .time-now {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #ffffff;
+            font-family: monospace;
+            line-height: 1;
+        }
+
+        .date-now {
+            font-size: 1.1rem;
+            color: var(--gold);
+            margin-top: 5px;
+        }
+
+        .btn-settings {
+            background: transparent;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-settings:hover {
+            background: var(--gold);
+            color: var(--bg-primary);
+        }
+
+        /* ----- MAIN CONTENT ----- */
+        main {
+            flex: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* ----- NEXT PRAYER HERO ----- */
+        .next-prayer-card {
+            background: linear-gradient(135deg, #112240 0%, #1d3557 100%);
+            border-radius: 20px;
+            border: 1px solid rgba(223, 177, 91, 0.3);
+            padding: 25px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .next-prayer-info h2 {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .next-prayer-info .prayer-name {
+            font-size: 3.5rem;
+            color: var(--gold-bright);
+            font-weight: 900;
+        }
+
+        .countdown-box {
+            text-align: center;
+            background: rgba(10, 25, 47, 0.6);
+            padding: 15px 30px;
+            border-radius: 15px;
+            border: 1px solid var(--gold);
+        }
+
+        .countdown-title {
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+
+        .countdown-timer {
+            font-size: 2.8rem;
+            font-weight: bold;
+            color: var(--accent-green);
+            font-family: monospace;
+        }
+
+        /* ----- PRAYER TIMES GRID ----- */
+        .prayers-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+        }
+
+        .prayer-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: 0.3s transform, 0.3s border;
+        }
+
+        .prayer-card.active {
+            border: 2px solid var(--gold);
+            background: linear-gradient(180deg, #1d3557 0%, var(--bg-card) 100%);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(223, 177, 91, 0.2);
+        }
+
+        .prayer-card .name {
+            font-size: 1.4rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .prayer-card.active .name {
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        .prayer-card .time {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        /* ----- ANNOUNCEMENT TICKER ----- */
+        .ticker-container {
+            background: var(--gold);
+            color: var(--bg-primary);
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .ticker-text {
+            display: inline-block;
+            animation: marquee 25s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* ----- MODAL / CONTROL PANEL ----- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 2px solid var(--gold);
+            border-radius: 20px;
+            padding: 30px;
+            width: 500px;
+            max-width: 90%;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+
+        .modal-content h3 {
+            color: var(--gold);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: var(--bg-primary);
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .btn-save {
+            width: 100%;
+            background: var(--gold);
+            color: var(--bg-primary);
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-save:hover {
+            background: var(--gold-bright);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            .prayers-grid { grid-template-columns: repeat(3, 1fr); }
+            header { flex-direction: column; gap: 15px; text-align: center; }
+            .clock-box { text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER: Mosque Info & Main Clock -->
+    <header>
+        <div class="mosque-info">
+            <h1 id="display-mosque-name" class="glow">مسجد النور</h1>
+            <p id="display-wilaya">ولاية الجزائر - الجزائر</p>
+        </div>
+        <div class="header-controls">
+            <div class="clock-box">
+                <div class="time-now" id="current-time">00:00:00</div>
+                <div class="date-now" id="current-date">جاري التحميل...</div>
+            </div>
+            <button class="btn-settings" onclick="openSettings()">⚙️ لوحة التحكم</button>
+        </div>
+    </header>
+
+    <!-- MAIN DISPLAY -->
+    <main>
+        <!-- Next Prayer Banner -->
+        <div class="next-prayer-card">
+            <div class="next-prayer-info">
+                <h2>الصلاة القادمة هي</h2>
+                <div class="prayer-name" id="next-prayer-name">الظهر</div>
+            </div>
+            <div class="countdown-box">
+                <div class="countdown-title">متبقي على الأذان</div>
+                <div class="countdown-timer" id="countdown-timer">00:00:00</div>
+            </div>
+        </div>
+
+        <!-- 6 Prayers Grid -->
+        <div class="prayers-grid">
+            <div class="prayer-card" id="card-Fajr">
+                <div class="name">الفجر</div>
+                <div class="time" id="time-Fajr">--:--</div>
+            </div>
+            <div class="prayer-card" id="card-Sunrise">
+                <div class="name">الشروق</div>
+                <div class="time" id="time-Sunrise">--:--</div>
+            </div>
+            <div class="prayer-card" id="card-Dhuhr">
+                <div class="name">الظهر</div>
+                <div class="time" id="time-Dhuhr">--:--</div>
+            </div>
+            <div class="prayer-card" id="card-Asr">
+                <div class="name">العصر</div>
+                <div class="time" id="time-Asr">--:--</div>
+            </div>
+            <div class="prayer-card" id="card-Maghrib">
+                <div class="name">المغرب</div>
+                <div class="time" id="time-Maghrib">--:--</div>
+            </div>
+            <div class="prayer-card" id="card-Isha">
+                <div class="name">العشاء</div>
+                <div class="time" id="time-Isha">--:--</div>
+            </div>
+        </div>
+
+        <!-- Announcement Bar -->
+        <div class="ticker-container">
+            <div class="ticker-text" id="display-ticker">مرحباً بكم في المسجد - إن الصلاة كانت على المؤمنين كتاباً موقوتاً - الرجاء إغلاق الهواتف النقالة.</div>
+        </div>
+    </main>
+
+    <!-- CONTROL PANEL MODAL -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-content">
+            <h3>⚙️ إعدادات المسجد والولايات</h3>
+            
+            <div class="form-group">
+                <label>اسم المسجد:</label>
+                <input type="text" id="input-mosque-name" value="مسجد النور">
+            </div>
+
+            <div class="form-group">
+                <label>الولاية (58 ولاية):</label>
+                <select id="select-wilaya"></select>
+            </div>
+
+            <div class="form-group">
+                <label>الشريط المتحرك (التنبيهات):</label>
+                <input type="text" id="input-ticker" value="مرحباً بكم في المسجد - إن الصلاة كانت على المؤمنين كتاباً موقوتاً">
+            </div>
+
+            <button class="btn-save" onclick="saveSettings()">حفظ وتحديث</button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // قائمة الـ 58 ولاية الجزائرية
+        const algerianWilayas = [
+            "أدرار", "الشلف", "الأغواط", "أم البواقي", "باتنة", "بجاية", "بسكرة", "بشار",
+            "البليدة", "البويرة", "تمنراست", "تبسة", "تلمسان", "تيارت", "تيزي وزو", "الجزائر",
+            "الجلفة", "جيجل", "سطيف", "سعيدة", "سكيكدة", "سيدي بلعباس", "عنابة", "قالمة",
+            "قسنطينة", "المدية", "مستغانم", "المسيلة", "معسكر", "ورقلة", "وهران", "البيض",
+            "إليزي", "برج بوعريريج", "بومرداس", "الطارف", "تندوف", "تيسمسيلت", "الوادي",
+            "خنشلة", "سوق أهراس", "تيبازة", "ميلة", "عين الدفلى", "النعامة", "عين تموشنت",
+            "غرداية", "غليزان", "تيميمون", "برج باجي مختار", "أولاد جلال", "بني عباس",
+            "إن صالح", "إن قزام", "تقرت", "جانت", "المغير", "المنيعة"
+        ];
+
+        let prayerTimesData = {};
+        let config = {
+            mosqueName: "مسجد النور",
+            wilaya: "الجزائر",
+            tickerText: "مرحباً بكم في المسجد - إن الصلاة كانت على المؤمنين كتاباً موقوتاً"
+        };
+
+        // Initialize App
+        window.onload = function() {
+            populateWilayas();
+            loadSavedConfig();
+            updateClock();
+            setInterval(updateClock, 1000);
+            fetchPrayerTimes();
+        };
+
+        // Fill Wilaya Select Box
+        function populateWilayas() {
+            const select = document.getElementById('select-wilaya');
+            algerianWilayas.forEach(w => {
+                let opt = document.createElement('option');
+                opt.value = w;
+                opt.innerHTML = w;
+                select.appendChild(opt);
+            });
+        }
+
+        // Clock & Date Updates
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('current-time').innerText = now.toLocaleTimeString('ar-DZ', {hour12: false});
+            
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const hijriDate = new Intl.DateTimeFormat('ar-TN-u-ca-islamic-uma', options).format(now);
+            document.getElementById('current-date').innerText = hijriDate;
+
+            if (Object.keys(prayerTimesData).length > 0) {
+                calculateNextPrayer(now);
+            }
+        }
+
+        // Fetch API Prayer Times (Using Aladhan API for Algerian Cities)
+        async function fetchPrayerTimes() {
+            try {
+                const response = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${config.wilaya}&country=Algeria&method=3`);
+                const data = await response.json();
+                
+                if (data.code === 200) {
+                    const timings = data.data.timings;
+                    prayerTimesData = {
+                        Fajr: timings.Fajr,
+                        Sunrise: timings.Sunrise,
+                        Dhuhr: timings.Dhuhr,
+                        Asr: timings.Asr,
+                        Maghrib: timings.Maghrib,
+                        Isha: timings.Isha
+                    };
+
+                    // UI Update
+                    document.getElementById('time-Fajr').innerText = timings.Fajr;
+                    document.getElementById('time-Sunrise').innerText = timings.Sunrise;
+                    document.getElementById('time-Dhuhr').innerText = timings.Dhuhr;
+                    document.getElementById('time-Asr').innerText = timings.Asr;
+                    document.getElementById('time-Maghrib').innerText = timings.Maghrib;
+                    document.getElementById('time-Isha').innerText = timings.Isha;
+                }
+            } catch (err) {
+                console.error("خطأ في جلب مواقيت الصلاة:", err);
+            }
+        }
+
+        // Calculate Next Prayer and Countdown
+        function calculateNextPrayer(now) {
+            const list = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+            const namesAr = { Fajr: 'الفجر', Sunrise: 'الشروق', Dhuhr: 'الظهر', Asr: 'العصر', Maghrib: 'المغرب', Isha: 'العشاء' };
+            
+            let nextPrayerKey = null;
+            let minDiff = Infinity;
+
+            list.forEach(key => {
+                document.getElementById(`card-${key}`).classList.remove('active');
+                
+                const timeStr = prayerTimesData[key];
+                if (!timeStr) return;
+
+                const [h, m] = timeStr.split(':');
+                let pDate = new Date();
+                pDate.setHours(parseInt(h), parseInt(m), 0);
+
+                let diff = pDate - now;
+                if (diff > 0 && diff < minDiff) {
+                    minDiff = diff;
+                    nextPrayerKey = key;
+                }
+            });
+
+            // If all prayers passed today, next is tomorrow Fajr
+            if (!nextPrayerKey) {
+                nextPrayerKey = 'Fajr';
+                const [h, m] = prayerTimesData['Fajr'].split(':');
+                let pDate = new Date();
+                pDate.setDate(pDate.getDate() + 1);
+                pDate.setHours(parseInt(h), parseInt(m), 0);
+                minDiff = pDate - now;
+            }
+
+            // Update Next Prayer UI
+            document.getElementById(`card-${nextPrayerKey}`).classList.add('active');
+            document.getElementById('next-prayer-name').innerText = namesAr[nextPrayerKey];
+
+            // Countdown Format
+            const hrs = Math.floor((minDiff / (1000 * 60 * 60)) % 24);
+            const mins = Math.floor((minDiff / (1000 * 60)) % 60);
+            const secs = Math.floor((minDiff / 1000) % 60);
+
+            document.getElementById('countdown-timer').innerText = 
+                `${hrs.toString().padStart(2,'0')}:${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+        }
+
+        // Modal Controls
+        function openSettings() {
+            document.getElementById('settings-modal').classList.add('active');
+        }
+
+        function saveSettings() {
+            config.mosqueName = document.getElementById('input-mosque-name').value;
+            config.wilaya = document.getElementById('select-wilaya').value;
+            config.tickerText = document.getElementById('input-ticker').value;
+
+            // Save to LocalStorage
+            localStorage.setItem('mosque_app_config', JSON.stringify(config));
+
+            applyConfig();
+            fetchPrayerTimes();
+
+            document.getElementById('settings-modal').classList.remove('active');
+        }
+
+        function applyConfig() {
+            document.getElementById('display-mosque-name').innerText = config.mosqueName;
+            document.getElementById('display-wilaya').innerText = `ولاية ${config.wilaya} - الجزائر`;
+            document.getElementById('display-ticker').innerText = config.tickerText;
+            
+            document.getElementById('input-mosque-name').value = config.mosqueName;
+            document.getElementById('select-wilaya').value = config.wilaya;
+            document.getElementById('input-ticker').value = config.tickerText;
+        }
+
+        function loadSavedConfig() {
+            const saved = localStorage.getItem('mosque_app_config');
+            if (saved) {
+                config = JSON.parse(saved);
+            }
+            applyConfig();
+        }
+    </script>
+</body>
+</html>
